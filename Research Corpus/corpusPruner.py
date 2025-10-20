@@ -1,5 +1,15 @@
 import pandas as pd
 import os
+import traceback
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+headless = True
 
 def resetDir():
     fileName = __file__
@@ -32,10 +42,23 @@ for i in corpusSources:
 
 corpus = list(set(corpus))
 
+os.chdir("..")
+print("Getting Titles...")
+Titles = []
+options = Options()
+if headless:
+    options.add_argument("--headless=new")
+driver = webdriver.Chrome(options=options)
+for i in corpus:
+    driver.get(i)
+    microTitle = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,"/html/body/primo-explore/div/prm-full-view-page/prm-full-view-cont/md-content/div[2]/prm-full-view/div/div/div/div[1]/div/div[2]/prm-full-view-service-container/div[2]/prm-brief-result-container/div[1]/div[3]/prm-brief-result/h3/a/span/prm-highlight/span"))).text
+    Titles.append(microTitle)
+driver.close()
+
+corpus = pd.DataFrame({"Source Link":corpus,"Title":Titles})
+corpus.sort_values(by="Title")
+corpus.drop_duplicates(subset=['Title'],inplace=True)
 print(f"Total number of articles in Pruned Research Corpus: {len(corpus)}")
 print(f"Total number of articles pre-pruning: {totalSources}\nSources pruned: {totalSources-len(corpus)}")
 print(f"{round(((totalSources-len(corpus))/totalSources) * 100,2)}% Duplicates")
-
-os.chdir("..")
-corpus = pd.DataFrame({"Source Link":corpus})
 corpus.to_csv("PrunedResearchPapers.csv")
