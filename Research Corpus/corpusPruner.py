@@ -35,3 +35,7 @@ corpus = list(set(corpus))
 print(f"Total number of articles in Pruned Research Corpus: {len(corpus)}")
 print(f"Total number of articles pre-pruning: {totalSources}\nSources pruned: {totalSources-len(corpus)}")
 print(f"{round(((totalSources-len(corpus))/totalSources) * 100,2)}% Duplicates")
+
+os.chdir("..")
+corpus = pd.DataFrame({"Source Link":corpus})
+corpus.to_csv("PrunedResearchPapers.csv")
