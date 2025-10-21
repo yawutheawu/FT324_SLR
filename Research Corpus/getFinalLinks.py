@@ -59,4 +59,5 @@ for k,i in enumerate(PaperTitles):
 titleAndLinkFinal = pd.DataFrame({"Title":PaperTitles,"Link":links})
 print("Got Processed Links")
 print(f"Final research corpus len: {len(titleAndLinkFinal)}")
+titleAndLinkFinal.index = titleAndLinkFinal.index + 1
 titleAndLinkFinal.to_csv("finalResearchCorpus.csv")
