@@ -37,7 +37,7 @@ links = []
 usedRowNums = []
 
 for k,i in enumerate(PaperTitles):
-    print(f"Fetching {k} of {len(PaperTitles)}")
+    print(f"Fetching {k+1} of {len(PaperTitles)}")
     flag = True
     rowNum = 2
     spaceCounter = 0
