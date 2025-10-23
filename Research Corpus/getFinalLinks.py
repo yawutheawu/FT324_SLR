@@ -21,11 +21,14 @@ analyzedLinks = xsl.load_workbook(analyzedLinksFilename, read_only=True, data_on
 processedSheet = analyzedLinks["Abstract Analysis"]
 
 PaperTitles = []
+removedTitles = []
 print("Getting Processed Titles")
 rowNum = 2
 while str(processedSheet[f"A{rowNum}"].value).strip() != "" and processedSheet[f"A{rowNum}"].value != None:
-    if str(processedSheet[f"B{rowNum}"].value).strip() == "Y":
+    if str(processedSheet[f"B{rowNum}"].value).strip().lower() == "y":
         PaperTitles.append(str(processedSheet[f"A{rowNum}"].value).strip())
+    if str(processedSheet[f"B{rowNum}"].value).strip().lower() == "n":
+        removedTitles.append(str(processedSheet[f"A{rowNum}"].value).strip())
     elif str(processedSheet[f"A{rowNum}"].value).strip() == "" or processedSheet[f"A{rowNum}"].value == None:
         print(f"{str(processedSheet[f"A{rowNum}"].value).strip()} has not been processed in the excel file!")
     rowNum+=1
@@ -56,8 +59,37 @@ for k,i in enumerate(PaperTitles):
                 pass
         rowNum += 1
 
+removedLinks = []
+removedUsedRowNums = []
+
+for k,i in enumerate(removedTitles):
+    print(f"Fetching {k+1} of {len(removedTitles)}")
+    flag = True
+    rowNum = 2
+    spaceCounter = 0
+    while flag:
+        if rowNum in removedUsedRowNums:
+            pass
+        else:
+            if str(linksheet[f"C{rowNum}"].value).strip() == i.strip():
+                removedLinks.append(str(linksheet[f"B{rowNum}"].value).strip())
+                removedUsedRowNums.append(rowNum)
+                flag = False
+            elif str(linksheet[f"C{rowNum}"].value).strip() == "" or linksheet[f"C{rowNum}"].value == None:
+                removedLinks.append(None)
+                flag = False
+            else:
+                pass
+        rowNum += 1
+
 titleAndLinkFinal = pd.DataFrame({"Title":PaperTitles,"Link":links})
 print("Got Processed Links")
 print(f"Final research corpus len: {len(titleAndLinkFinal)}")
 titleAndLinkFinal.index = titleAndLinkFinal.index + 1
 titleAndLinkFinal.to_csv("finalResearchCorpus.csv")
+
+removedLinksAndTitles = pd.DataFrame({"Title":removedTitles,"Link":removedLinks})
+print("Got Removed Links")
+print(f"Amt Removed: {len(removedLinksAndTitles)}")
+removedLinksAndTitles.index = removedLinksAndTitles.index + 1
+removedLinksAndTitles.to_csv("RemovedResearch.csv")
