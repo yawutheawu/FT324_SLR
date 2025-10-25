@@ -58,3 +58,6 @@ resetDir()
 averagedData.to_excel("Averaged Data.xlsx")
 print(averagedData.head(10))
 print("Average Data saved")
+
+plt = averagedData.plot()
+plt.imshow()
